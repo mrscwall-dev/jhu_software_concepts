@@ -1,11 +1,29 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block header %}
-  <h2>{% block title %}Home{% endblock title %}</h2>
-{% endblock header %}
+{% block title %}Home{% endblock title %}
 
 {% block content %}
-  <p>
-    Learn more about this project by visiting the <a href="{{ url_for('pages.about') }}">About page</a>.
-  </p>
+<section class="card profile-layout">
+  <div class="bio">
+    <h2>About Me</h2>
+
+    <h3>Senior Policy Writer | Artificial Intelligence Graduate Student</h3>
+
+    <p>
+      I am a Senior Policy Writer with experience in law enforcement,
+      investigations, training, leadership, and public-safety policy
+      development. I am also pursuing graduate studies in artificial
+      intelligence at Johns Hopkins University. My work combines public
+      service, communication, and technology to create practical solutions
+      that strengthen organizations and communities.
+    </p>
+  </div>
+
+  <div class="profile-image">
+    <img
+      src="{{ url_for('static', filename='profile.jpeg') }}"
+      alt="Professional portrait of Lynn Wall"
+    >
+  </div>
+</section>
 {% endblock content %}

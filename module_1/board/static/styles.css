@@ -3,32 +3,115 @@
 }
 
 body {
-  font-family: sans-serif;
-  font-size: 20px;
-  margin: 0 auto;
+  margin: 0;
+  background-color: #f4f7f5;
+  color: #24332b;
+  font-family: Arial, sans-serif;
   text-align: center;
 }
 
-a,
-a:visited {
-  color: #007bff;
+header {
+  background-color: #174f35;
+  color: white;
+  padding: 30px 20px;
 }
 
-a:hover {
-  color: #0056b3;
+header h1 {
+  margin: 0;
+  font-size: 42px;
 }
 
-nav ul {
-  list-style-type: none;
-  padding: 0;
+nav {
+  margin-top: 25px;
 }
 
-nav ul li {
-  display: inline;
-  margin: 0 5px;
+nav a {
+  color: white;
+  display: inline-block;
+  margin: 5px;
+  padding: 10px 16px;
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+nav a:hover,
+nav a.active {
+  background-color: white;
+  color: #174f35;
 }
 
 main {
-  width: 80%;
+  width: 85%;
+  max-width: 900px;
+  margin: 35px auto;
+}
+
+.card {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
+
+.card a {
+  color: #174f35;
+}
+.profile-layout {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  text-align: left;
+}
+
+.bio {
+  flex: 1;
+}
+
+.profile-image {
+  flex: 0 0 280px;
+  text-align: center;
+}
+
+.profile-image img {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  height: 350px;
   margin: 0 auto;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 10px;
+}
+
+@media (max-width: 700px) {
+  .profile-layout {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-image {
+    flex-basis: auto;
+  }
+}
+header {
+  position: relative;
+  text-align: left;
+}
+
+nav {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
+  header {
+    text-align: center;
+  }
+
+  nav {
+    position: static;
+    margin-top: 25px;
+  }
 }
