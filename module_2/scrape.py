@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 BASE_URL = "https://www.thegradcafe.com"
 OUTPUT_FILE = Path("applicant_data.json")
 
-# Temporary files stay outside the Git repository.
+# Temporary working files are kept outside the Git repository.
 CACHE_DIR = Path.home() / ".cache" / "jhu_module2" / "raw_html"
 STATE_FILE = Path.home() / ".cache" / "jhu_module2" / "scrape_state.json"
 
@@ -23,7 +23,7 @@ class GradCafeScraper:
     """Capture and parse publicly available GradCafe admissions results."""
 
     def get_current_url(self) -> str:
-        """Return the URL of the active Chrome tab."""
+        """Return the URL of the active Google Chrome tab."""
 
         script = """
         tell application "Google Chrome"
@@ -62,7 +62,7 @@ class GradCafeScraper:
         return current_url, result.stdout
 
     def navigate_to(self, url: str) -> None:
-        """Navigate Chrome to a GradCafe results page and wait for loading."""
+        """Navigate Chrome to a GradCafe results page."""
 
         self._validate_results_url(url)
 
@@ -85,43 +85,34 @@ class GradCafeScraper:
         deadline = time.time() + 60
 
         while time.time() < deadline:
-            current = urlparse(self.get_current_url())
+            try:
+                current = urlparse(self.get_current_url())
 
-            correct_page = (
-                current.netloc == target.netloc
-                and current.path == target.path
-                and current.query == target.query
-            )
-
-            if correct_page:
-                ready_script = """
-                tell application "Google Chrome"
-                    execute active tab of front window javascript "document.readyState"
-                end tell
-                """
-
-                result = subprocess.run(
-                    ["osascript", "-e", ready_script],
-                    capture_output=True,
-                    text=True,
-                    check=True,
+                correct_page = (
+                    current.netloc == target.netloc
+                    and current.path == target.path
+                    and current.query == target.query
                 )
 
-                if result.stdout.strip() == "complete":
-                    time.sleep(1)
+                if correct_page:
+                    # Give Chrome a moment to finish rendering.
+                    time.sleep(2)
                     return
+
+            except subprocess.CalledProcessError:
+                pass
 
             time.sleep(0.5)
 
         raise RuntimeError(
-            "Chrome did not finish loading the next GradCafe page."
+            "Chrome did not navigate to the next GradCafe page."
         )
 
     def wait_for_results(
         self,
         timeout: int = 60,
     ) -> tuple[str, str]:
-        """Wait until a GradCafe results table is available."""
+        """Wait until the GradCafe applicant results table is available."""
 
         deadline = time.time() + timeout
 
@@ -279,7 +270,6 @@ class GradCafeScraper:
                 " ",
                 strip=True,
             )
-
             degree_type = None
 
         raw_program_text = program_cell.get_text(
@@ -541,7 +531,7 @@ class GradCafeScraper:
         text: str,
         patterns: list[str],
     ) -> float | None:
-        """Extract a decimal number from text."""
+        """Extract a decimal value from text."""
 
         for pattern in patterns:
             match = re.search(
@@ -559,7 +549,7 @@ class GradCafeScraper:
         self,
         url: str,
     ) -> None:
-        """Allow only the public GradCafe survey page."""
+        """Allow only GradCafe's public survey results page."""
 
         parsed = urlparse(url)
 
@@ -581,7 +571,7 @@ def save_data(
     data: list[dict],
     filename: Path = OUTPUT_FILE,
 ) -> None:
-    """Save applicant records as JSON."""
+    """Save applicant records as valid JSON."""
 
     with filename.open(
         "w",
@@ -614,7 +604,7 @@ def merge_data(
     existing: list[dict],
     new_records: list[dict],
 ) -> int:
-    """Add new applicants without duplicating URLs."""
+    """Add new applicants without duplicating applicant URLs."""
 
     existing_urls = {
         record.get("applicant_url")
@@ -667,7 +657,7 @@ def save_state(
     total_records: int,
     page_number: int,
 ) -> None:
-    """Save restart information outside the repository."""
+    """Save a restart point outside the Git repository."""
 
     STATE_FILE.parent.mkdir(
         parents=True,
@@ -690,7 +680,7 @@ def save_state(
 
 
 def load_state() -> dict | None:
-    """Load restart information."""
+    """Load the previous restart point."""
 
     if not STATE_FILE.exists():
         return None
@@ -712,26 +702,26 @@ def main() -> None:
     parser.add_argument(
         "--pages",
         type=int,
-        help="Number of results pages to process.",
+        help="Number of GradCafe result pages to process.",
     )
 
     parser.add_argument(
         "--target",
         type=int,
-        help="Continue until this many unique records exist.",
+        help="Continue until this many unique applicant records exist.",
     )
 
     parser.add_argument(
         "--delay",
         type=float,
         default=4.0,
-        help="Seconds to wait between pages.",
+        help="Seconds to wait before navigating to the next page.",
     )
 
     parser.add_argument(
         "--resume",
         action="store_true",
-        help="Resume from the previously saved next-page URL.",
+        help="Resume using the saved next-page URL.",
     )
 
     args = parser.parse_args()
@@ -752,7 +742,6 @@ def main() -> None:
 
     scraper = GradCafeScraper()
     all_data = load_data()
-
     saved_state = load_state()
 
     if args.resume:
