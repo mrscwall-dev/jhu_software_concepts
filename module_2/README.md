@@ -127,3 +127,67 @@ From the `module_2` folder:
 
 ```bash
 python -m pip install -r requirements.txt
+```
+
+The instructor-provided LLM package also contains its own requirements file under `llm_hosting`.
+
+For compatibility with `llama-cpp-python`, the LLM portion was run using Python 3.12.10.
+
+## Running the Scraper
+
+Open the public GradCafe admissions results page in Google Chrome and complete any Cloudflare verification manually.
+
+To test a small number of pages:
+
+```bash
+python scrape.py --pages 3
+```
+
+To resume after an interruption:
+
+```bash
+python scrape.py --target 30000 --resume
+```
+
+The scraper saves the collected applicant records to:
+
+`applicant_data.json`
+
+## Preparing Data for LLM Cleaning
+
+From the `module_2` folder, run:
+
+```bash
+python clean.py
+```
+
+This prepares the scraped records for the instructor-provided LLM application while preserving the original applicant data.
+
+## Running the Local LLM
+
+Enter the instructor-provided folder:
+
+```bash
+cd llm_hosting
+```
+
+The local LLM standardizes the program and university fields and adds:
+
+- `llm-generated-program`
+- `llm-generated-university`
+
+For this assignment, the 30,000 records were divided into four approximately equal chunks and processed in parallel to reduce processing time.
+
+The completed outputs were merged into:
+
+`llm_extend_applicant_data.json`
+
+The final cleaned file contains 30,000 records.
+
+## Known Limitations
+
+GradCafe is a live external website. Changes to its HTML structure, pagination, or Cloudflare behavior may require future changes to the scraper.
+
+The browser-capture portion uses Google Chrome and macOS AppleScript, so that portion of the implementation is macOS-specific.
+
+The local TinyLlama model may produce imperfect standardized names for uncommon institutions, abbreviations, misspellings, or ambiguous program names. Original source values were preserved for traceability.
