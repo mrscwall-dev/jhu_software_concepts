@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grad Café Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <main>
+        <div class="page-header">
+            <div>
+                <h1>Grad Café Application Analysis</h1>
+            </div>
+
+            <div class="button-group">
+                <form action="{{ url_for('pull_data') }}" method="post">
+                    <button type="submit" {% if pull_running %}disabled{% endif %}>
+                        Pull Data
+                    </button>
+                </form>
+
+                <form action="{{ url_for('update_analysis') }}" method="post">
+                    <button type="submit">
+                        Update Analysis
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <p class="pull-description">
+            Pull Data checks Grad Café for newly submitted application results
+            and adds new records to the database. Depending on the amount of new
+            data available, this may take some time.
+        </p>
+
+        {% if pull_running %}
+            <p class="status-message">
+                New Grad Café data is currently being retrieved.
+            </p>
+        {% endif %}
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="status-message">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h2>Question 1</h2>
+        <p>How many entries are from applicants who applied for Fall 2026?</p>
+        <p><strong>Answer:</strong> {{ results.q1 }}</p>
+
+        <h2>Question 2</h2>
+        <p>Among entries that provide a nationality classification, what percentage are international students?</p>
+        <p><strong>Answer:</strong> {{ "%.2f"|format(results.q2) }}%</p>
+
+        <h2>Question 3</h2>
+        <p>What are the average GPA and GRE scores of applicants who provide each metric?</p>
+        <p><strong>Average GPA:</strong> {{ "%.2f"|format(results.gpa) }}</p>
+        <p><strong>Average GRE Quantitative:</strong> {{ "%.2f"|format(results.gre) }}</p>
+        <p><strong>Average GRE Verbal:</strong> {{ "%.2f"|format(results.gre_v) }}</p>
+        <p><strong>Average GRE Analytical Writing:</strong> {{ "%.2f"|format(results.gre_aw) }}</p>
+
+        <h2>Question 4</h2>
+        <p>What is the average GPA of American applicants who applied for Fall 2026?</p>
+        <p><strong>Answer:</strong> {{ "%.2f"|format(results.q4) }}</p>
+
+        <h2>Question 5</h2>
+        <p>What percentage of Fall 2025 entries are acceptances?</p>
+        <p><strong>Answer:</strong> {{ "%.2f"|format(results.q5) }}%</p>
+
+        <h2>Question 6</h2>
+        <p>What is the average GPA of accepted applicants who applied for Fall 2026?</p>
+        <p><strong>Answer:</strong> {{ "%.2f"|format(results.q6) }}</p>
+
+        <h2>Question 7</h2>
+        <p>How many applicants applied to Johns Hopkins University for a master's degree in Computer Science?</p>
+        <p><strong>Answer:</strong> {{ results.q7 }}</p>
+
+        <h2>Question 8</h2>
+        <p>
+            How many Fall 2026 Computer Science PhD acceptances were reported
+            for Georgetown, MIT, Stanford, or Carnegie Mellon using the original fields?
+        </p>
+        <p><strong>Answer:</strong> {{ results.q8 }}</p>
+
+        <h2>Question 9</h2>
+        <p>
+            What is the count when the LLM-generated program and university
+            fields are used instead?
+        </p>
+        <p><strong>Original-field count:</strong> {{ results.q8 }}</p>
+        <p><strong>LLM-field count:</strong> {{ results.q9 }}</p>
+        <p><strong>Difference:</strong> {{ results.difference }}</p>
+
+        <h2>Question 10</h2>
+        <p>What percentage of Fall 2026 entries are acceptances?</p>
+        <p><strong>Answer:</strong> {{ "%.2f"|format(results.q10) }}%</p>
+
+        <h2>Question 11</h2>
+        <p>What is the average GPA of international applicants who applied for Fall 2026?</p>
+        <p><strong>Answer:</strong> {{ "%.2f"|format(results.q11) }}</p>
+    </main>
+</body>
+</html>

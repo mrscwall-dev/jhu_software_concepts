@@ -1,0 +1,8 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+module_2.zip
+module_3/models/
