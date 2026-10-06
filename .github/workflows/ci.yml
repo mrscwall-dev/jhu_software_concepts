@@ -62,12 +62,9 @@ jobs:
         run: npm install -g snyk
 
       - name: Run Snyk
-        run: |
-               - name: Run Snyk
         continue-on-error: true
         run: |
           cd module_5
-          snyk test cd module_5
           snyk test
 
       - name: Run tests
